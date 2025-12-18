@@ -18,23 +18,22 @@ Para atender aos requisitos de múltiplos clientes (CLI, Web) e, principalmente,
 A estrutura consiste em um **Módulo Core** central que contém toda a lógica de negócio, e múltiplos **Clientes** que consomem este módulo.
 
 ```
-                                     ┌───────────────────┐
-                                     │   SonarQube API   │
-                                     └─────────┬─────────┘
-                                               │
-                               ┌───────────────┴───────────────┐
-                               │  Módulo Core (`smarter-sonar`)│
-                               │ Lógica de acesso e consolidação │
-                               └───────────────┬───────────────┘
-                                               │
-                 ┌─────────────────────────────┴─────────────────────────────┐
-                 │                                                           │
-┌────────────────┴────────────────┐                  ┌───────────────────────┴───────────────────────┐
-│         Cliente 1: CLI          │                  │             Cliente 2: Aplicação Web            │
-│                                 │                  │                                                 │
-│  - Importa e usa o Módulo Core  │                  │  [ Front-end (React) ] <--> [ Servidor (Node) ]  │
-│  - Exibe dados no console       │                  │                             - Importa o Módulo  │
-└─────────────────────────────────┘                  └─────────────────────────────────────────────────┘
+        ┌───────────────┐
+        │ SonarQube API │
+        └───────┬───────┘
+                │
+┌───────────────┴───────────────┐
+│  Módulo Core (`smarter-sonar`)│
+│ (Lógica de acesso e dados)    │
+└───────────────┬───────────────┘
+                │
+     ┌──────────┴──────────┐
+     │                     │
+┌────┴─────┐      ┌────────┴──────────┐
+│ CLI      │      │ Aplicação Web     │
+│- Importa │      │- Front-end (React)│
+│- Console │      │- Back-end (Node)  │
+└──────────┘      └───────────────────┘
 ```
 
 ### 2.1. Módulo Core
