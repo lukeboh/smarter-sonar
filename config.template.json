@@ -1,0 +1,9 @@
+{
+  "sonarUrl": "https://sonar.tse.jus.br/",
+  "token": "COLE_SEU_TOKEN_AQUI",
+  "debug": false,
+  "projects": [
+    "exemplo-de-projeto-backend",
+    "exemplo-de-projeto-frontend"
+  ]
+}

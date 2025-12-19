@@ -31,3 +31,5 @@ lerna-debug.log*
 # OS-specific
 .DS_Store
 Thumbs.db
+# Configuration files
+config.json
