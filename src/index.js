@@ -160,26 +160,10 @@ async function fetchAllProjects(sonarUrl, token, isDebugMode) {
   }
 }
 
-// --- Lógica Principal da CLI ---
+// --- Funções de Lógica de Negócio ---
 
-async function main() {
-    const config = await getFinalConfig();
-    const { sonarUrl, token, debug, sortBy, projects: projectsFromConfig, colorMapping } = config;
-
-    if (!token || token.includes('COLE_SEU_TOKEN_AQUI')) {
-        console.error('Token de acesso não configurado. Forneça via "config.json" ou com o parâmetro --token.');
-        return;
-    }
-    if (!sonarUrl) {
-        console.error('URL do SonarQube não configurada. Forneça via "config.json" ou com o parâmetro --sonarUrl.');
-        return;
-    }
-
-    if (projectsFromConfig && (process.argv.includes('--projects') || process.argv.includes('-p'))) {
-        console.log(`Salvando ${projectsFromConfig.length} projeto(s) fornecido(s) via linha de comando.`);
-        await writeConfig(config);
-        return;
-    }
+async function manageProjects(config) {
+    const { sonarUrl, token, debug, sortBy, colorMapping } = config;
 
     const allProjects = await fetchAllProjects(sonarUrl, token, debug);
 
@@ -199,8 +183,8 @@ async function main() {
     let displayProjects = allProjects;
     if (filterTerm) {
         const lowerCaseFilter = filterTerm.toLowerCase();
-        displayProjects = allProjects.filter(p => 
-            p.key.toLowerCase().includes(lowerCaseFilter) || 
+        displayProjects = allProjects.filter(p =>
+            p.key.toLowerCase().includes(lowerCaseFilter) ||
             (p.name && p.name.toLowerCase().includes(lowerCaseFilter))
         );
         console.log(`\nExibindo ${displayProjects.length} de ${allProjects.length} projetos que correspondem a "${filterTerm}".\n`);
@@ -252,15 +236,15 @@ async function main() {
         if (parenthesisString) {
             displayName += ` (${parenthesisString})`;
         }
-        
+
         const lowerCaseKey = p.key.toLowerCase();
-        
+
         for (const keyword of colorPrecedence) {
             if (lowerCaseKey.includes(keyword.toLowerCase())) {
                 const colorName = colorMapping[keyword];
                 if (colorName && typeof chalk[colorName] === 'function') {
                     displayName = chalk[colorName](displayName);
-                    break; 
+                    break;
                 }
             }
         }
@@ -271,7 +255,7 @@ async function main() {
             checked: config.projects?.includes(p.key) || false
         };
     });
-    
+
     if (choices.length === 0) {
         console.log('Nenhum projeto corresponde ao seu filtro.');
         return;
@@ -293,12 +277,59 @@ async function main() {
     const unlistedProjects = existingProjects.filter(pKey => !displayedProjectKeys.includes(pKey));
 
     const newSelectedProjects = [...unlistedProjects, ...answers.selectedProjects];
-    
+
     // Remove duplicados, caso existam
     const finalProjects = [...new Set(newSelectedProjects)];
 
     const newConfig = { ...config, projects: finalProjects };
     await writeConfig(newConfig);
+}
+
+
+// --- Lógica Principal da CLI ---
+
+async function main() {
+    const config = await getFinalConfig();
+    const { sonarUrl, token, projects: projectsFromConfig } = config;
+
+    if (!token || token.includes('COLE_SEU_TOKEN_AQUI')) {
+        console.error('Token de acesso não configurado. Forneça via "config.json" ou com o parâmetro --token.');
+        return;
+    }
+    if (!sonarUrl) {
+        console.error('URL do SonarQube não configurada. Forneça via "config.json" ou com o parâmetro --sonarUrl.');
+        return;
+    }
+
+    if (projectsFromConfig && (process.argv.includes('--projects') || process.argv.includes('-p'))) {
+        console.log(`Salvando ${projectsFromConfig.length} projeto(s) fornecido(s) via linha de comando.`);
+        await writeConfig(config);
+        return;
+    }
+
+    const { action } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'action',
+            message: 'O que você gostaria de fazer?',
+            choices: [
+                { name: 'Selecionar/gerenciar projetos', value: 'manage' },
+                new inquirer.Separator(),
+                { name: 'Sair', value: 'exit' },
+            ],
+        },
+    ]);
+
+    switch (action) {
+        case 'manage':
+            await manageProjects(config);
+            break;
+        case 'exit':
+            console.log('Saindo...');
+            process.exit(0);
+        default:
+            break;
+    }
 }
 
 // Ação principal
