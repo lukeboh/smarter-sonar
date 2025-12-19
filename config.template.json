@@ -1,7 +1,13 @@
 {
+  "_comment_sonarUrl": "URL da sua instância do SonarQube. Ex: 'https://sonar.example.com/'",
   "sonarUrl": "https://sonar.tse.jus.br/",
+  "_comment_token": "Token de usuário do SonarQube com permissão de 'Browse' nos projetos.",
   "token": "COLE_SEU_TOKEN_AQUI",
+  "_comment_debug": "Ative (true) para ver mais detalhes sobre as chamadas de API no console.",
   "debug": false,
+  "_comment_sortBy": "Define a ordem dos projetos na seleção. Opções: 'default' (ordem da API), 'component_branch' (componente e branch), 'group_component_branch' (grupo, componente e branch).",
+  "sortBy": "default",
+  "_comment_projects": "Lista de chaves de projetos que você deseja monitorar (preenchido automaticamente).",
   "projects": [
     "exemplo-de-projeto-backend",
     "exemplo-de-projeto-frontend"
