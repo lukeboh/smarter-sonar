@@ -5,6 +5,7 @@ import axios from 'axios';
 import inquirer from 'inquirer';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import chalk from 'chalk';
 
 // --- Funções de Configuração ---
 
@@ -163,7 +164,7 @@ async function fetchAllProjects(sonarUrl, token, isDebugMode) {
 
 async function main() {
     const config = await getFinalConfig();
-    const { sonarUrl, token, debug, sortBy, projects: projectsFromConfig } = config;
+    const { sonarUrl, token, debug, sortBy, projects: projectsFromConfig, colorMapping } = config;
 
     if (!token || token.includes('COLE_SEU_TOKEN_AQUI')) {
         console.error('Token de acesso não configurado. Forneça via "config.json" ou com o parâmetro --token.');
@@ -234,6 +235,8 @@ async function main() {
         });
     }
 
+    const colorPrecedence = colorMapping ? Object.keys(colorMapping) : [];
+
     const choices = displayProjects.map((p, i) => {
         const parts = p.key.split(':');
         const group = parts[0] || '';
@@ -250,6 +253,18 @@ async function main() {
             displayName += ` (${parenthesisString})`;
         }
         
+        const lowerCaseKey = p.key.toLowerCase();
+        
+        for (const keyword of colorPrecedence) {
+            if (lowerCaseKey.includes(keyword.toLowerCase())) {
+                const colorName = colorMapping[keyword];
+                if (colorName && typeof chalk[colorName] === 'function') {
+                    displayName = chalk[colorName](displayName);
+                    break; 
+                }
+            }
+        }
+
         return {
             name: displayName,
             value: p.key,

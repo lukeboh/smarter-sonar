@@ -7,6 +7,13 @@
   "debug": false,
   "_comment_sortBy": "Define a ordem dos projetos na seleção. Opções: 'default' (ordem da API), 'component_branch' (componente e branch), 'group_component_branch' (grupo, componente e branch).",
   "sortBy": "default",
+  "_comment_colorMapping": "Define as cores para palavras-chave encontradas nas chaves dos projetos. Cores disponíveis: black, red, green, yellow, blue, magenta, cyan, white.",
+  "colorMapping": {
+    "stable": "green",
+    "master": "red",
+    "release": "cyan",
+    "develop": "yellow"
+  },
   "_comment_projects": "Lista de chaves de projetos que você deseja monitorar (preenchido automaticamente).",
   "projects": [
     "exemplo-de-projeto-backend",
